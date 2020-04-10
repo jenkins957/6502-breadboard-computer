@@ -6,12 +6,23 @@
 #define CLOCK 2
 #define READ_WRITE 3
 
+#define ARDUINO_EXT_CLOCK 12
+#define CLK_SPEED 1000
+
 const char ADDR[] = {22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52};
 const char DATA[] = {39, 41, 43, 45, 47, 49, 51, 53};
 
 
 void setup() 
 {
+  // Read in the clock pin, to trigger the function when a clock pulse is detected
+  pinMode(CLOCK, INPUT);
+  pinMode(READ_WRITE, INPUT);  
+
+  // Use the Arduino to generate a Clock pulse
+  pinMode(ARDUINO_EXT_CLOCK, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+
   for(int n = 0; n < 16; n += 1)
   {
     pinMode(ADDR[n], INPUT);
@@ -22,8 +33,7 @@ void setup()
     pinMode(DATA[n], INPUT);
   }
 
-  pinMode(CLOCK, INPUT);
-  pinMode(READ_WRITE, INPUT);
+
   
   attachInterrupt(digitalPinToInterrupt(CLOCK), onClock, RISING);
   
@@ -59,5 +69,13 @@ void onClock()
 
 void loop() 
 {
+  // Create a clock pusle if not using an external clock
+  
+  digitalWrite(ARDUINO_EXT_CLOCK, HIGH);   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(CLK_SPEED);                              // wait for a second
 
+  digitalWrite(ARDUINO_EXT_CLOCK, LOW);    // turn the LED off by making the voltage LOW
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(CLK_SPEED);
 }
