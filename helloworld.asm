@@ -28,49 +28,44 @@ reset:
   lda #%00000110 ; Increment and shift cursor; don't shift display
   jsr lcd_instruction
 
-  lda #"H"
-  jsr print_char
+  lda #$00000001  ; Clear display
+  jsr lcd_instruction
 
-  lda #"e"
+  ldx #0
+print:
+  lda message, x
+  beq loop
   jsr print_char
-
-  lda #"l"
-  jsr print_char
-
-  lda #"l"
-  jsr print_char
-
-  lda #"o"
-  jsr print_char
-
-  lda #","
-  jsr print_char
-
-  lda #" "
-  jsr print_char
-
-  lda #"w"
-  jsr print_char
-
-  lda #"o"
-  jsr print_char
-
-  lda #"r"
-  jsr print_char
-
-  lda #"l"
-  jsr print_char
-
-  lda #"d"
-  jsr print_char
-
-  lda #"!"
-  jsr print_char
+  inx
+  jmp print
 
 loop:
   jmp loop
 
+message: asciiz "Hello world!                            6502 Processor"
+
+lcd_wait:
+  pha
+  lda #%00000000  ; Port B to input
+  sta DDRB
+lcd_busy:
+  lda #RW
+  sta PORTA
+  lda #(RW | E)
+  sta PORTA
+  lda PORTB
+  and #%10000000
+  bne lcd_busy
+
+  lda #RW
+  sta PORTA
+  lda #%11111111  ; Port B bacl to output
+  sta DDRB
+  pla
+  rts
+
 lcd_instruction:
+  jsr lcd_wait
   sta PORTB
   lda #0         ; Clear RS/RW/E bits
   sta PORTA
@@ -81,6 +76,7 @@ lcd_instruction:
   rts
 
 print_char:
+  jsr lcd_wait
   sta PORTB
   lda #RS         ; Set RS; Clear RW/E bits
   sta PORTA
