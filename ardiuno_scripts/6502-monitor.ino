@@ -7,7 +7,7 @@
 #define READ_WRITE 3
 
 #define ARDUINO_EXT_CLOCK 12
-#define CLK_SPEED 1000
+#define CLK_SPEED 1
 
 const char ADDR[] = {22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52};
 const char DATA[] = {39, 41, 43, 45, 47, 49, 51, 53};
@@ -33,8 +33,7 @@ void setup()
     pinMode(DATA[n], INPUT);
   }
 
-
-  
+  // Detect clok pulse and use this as trigger to log out address & data lines
   attachInterrupt(digitalPinToInterrupt(CLOCK), onClock, RISING);
   
   Serial.begin(57600);
